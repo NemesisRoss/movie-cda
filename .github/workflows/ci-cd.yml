@@ -98,25 +98,21 @@ jobs:
           uses: shivammathur/setup-php@v2
           with:
             php-version: '8.4'
-            extensions: mbstring, intl, pdo_mysql, sodium, zip
+            extensions: mbstring, intl, pdo_mysql, sodium
             tools: composer
-            coverage: none
-        
-        # installation des dépendances composer prod
-        - name: Installer dépendances Composer
-          run: composer install --no-interaction --prefer-dist
 
         # build env.php for prod
         - name: Build env.php for the app prod
           run: |
-            cat > env.php <<'PHP'
-            <?php
-            const BDD_LOGIN = "${{ secrets.BDD_LOGIN }}";
-            const BDD_PASSWORD = "${{ secrets.BDD_PASSWORD }}";
-            const BDD_SERVER = "${{ secrets.BDD_SERVER }}";
-            const BDD_NAME = "${{ secrets.BDD_LOGIN }}";
-            const BASE_URL = "/";
-            PHP
+                cp .env .env.test
+                echo "APP_ENV=test" >> .env
+                echo "APP_ENV=test" >> .env.test
+                echo "DATABASE_URL=mysql://${{ secrets.BDD_LOGIN }}:${{ secrets.BDD_PASSWORD }}@${{ secrets.BDD_SERVER }}/${{ secrets.BDD_LOGIN }}" >> .env.test
+        #        echo "JWT_PASSPHRASE=masupercle" >> .env.test
+
+        # installation des dépendances composer prod
+        - name: Installer dépendances Composer
+          run: composer install --no-interaction --prefer-dist
         
         # Deployment via FTP
         - name: 📂 Deployment to FTP
