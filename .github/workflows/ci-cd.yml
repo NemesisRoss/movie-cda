@@ -86,7 +86,7 @@ jobs:
                 if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
   # Job de deploiement par FTP
     deploy:
-      needs: e2e
+      needs: Symfony-test
       runs-on: ubuntu-latest
       steps:
         # Checkout du code(récupération depuis le repo github)
