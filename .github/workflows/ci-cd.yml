@@ -84,3 +84,44 @@ jobs:
                 name: cypress-videos
                 path: cypress/videos
                 if-no-files-found: ignore # 'warn' or 'error' are also available, defaults to `warn`
+# Job de deploiement par FTP
+deploy:
+  needs: e2e
+  runs-on: ubuntu-latest
+  steps:
+    # Checkout du code(récupération depuis le repo github)
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    # Setup PHP, Composer, extensions
+    - name: Setup PHP CLI (Composer & outils)
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, intl, pdo_mysql, sodium, zip
+        tools: composer
+        coverage: none
+    
+    # installation des dépendances composer prod
+    - name: Installer dépendances Composer
+      run: composer install --no-interaction --prefer-dist
+    
+    # build env.php for prod
+    - name: Build env.php for the app prod
+      run: |
+        cat > env.php <<'PHP'
+        <?php
+        const BDD_LOGIN = "${{ secrets.BDD_LOGIN }}";
+        const BDD_PASSWORD = "${{ secrets.BDD_PASSWORD }}";
+        const BDD_SERVER = "${{ secrets.BDD_SERVER }}";
+        const BDD_NAME = "${{ secrets.BDD_LOGIN }}";
+        const BASE_URL = "/";
+        PHP
+    
+    # Deployment via FTP
+    - name: 📂 Deployment to FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
