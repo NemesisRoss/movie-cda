@@ -97,10 +97,9 @@ jobs:
         - name: Setup PHP CLI (Composer & outils)
           uses: shivammathur/setup-php@v2
           with:
-            php-version: '8.2'
-            extensions: mbstring, intl, pdo_mysql, sodium, zip
+            php-version: '8.4'
+            extensions: mbstring, intl, pdo_mysql, sodium
             tools: composer
-            coverage: none
         
         # installation des dépendances composer prod
         - name: Installer dépendances Composer
